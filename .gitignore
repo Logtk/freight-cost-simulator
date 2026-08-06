@@ -1,0 +1,13 @@
+.env
+logs/
+archive/
+__pycache__/
+*.pyc
+.pytest_cache/
+data/*.db
+# 生成物(合成データのCSV)はコミットしない。生成器自体が成果物という設計方針のため
+data/synth/*.csv
+# 個人のローカル権限設定(プロジェクト間で共有しない)
+.claude/settings.local.json
+# 記入済みの可視性アセスメント(自社実オペレーション情報を含む)。テンプレートのみ公開する
+docs/data_visibility_assessment_filled*.md
