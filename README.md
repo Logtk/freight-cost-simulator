@@ -160,6 +160,6 @@ src/
 
 ## GitHub / タスクスケジューラ
 
-- GitHub: 未作成(ポートフォリオとしてPublic公開予定。初回pushの前に `pre-publish-anonymization-check` スキルを通す)
+- GitHub(Public): https://github.com/Logtk/freight-cost-simulator
 - タスクスケジューラ登録: なし(対話的に使うツールのため不要)
 - Discord/Obsidian連携: なし
