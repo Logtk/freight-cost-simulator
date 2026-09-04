@@ -8,9 +8,13 @@
 import pandas as pd
 import streamlit as st
 
+from datetime import date
+
 from src import cost_engine as ce
 from src import db
 from src import seed_data
+from src.synth import generate as synth_generate
+from src.synth import load_to_db as synth_load
 from src.ui import customer_portfolio, monthly, negotiation, perspective_gap, sensitivity, visibility_gap
 
 st.set_page_config(page_title="運送採算カルテ", page_icon="🚛", layout="wide")
@@ -21,6 +25,11 @@ def get_conn():
     conn = db.get_connection(check_same_thread=False)
     db.init_schema(conn)
     seed_data.seed(conn)
+    # クラウド等、`python -m src.synth.load_to_db` を事前実行できない環境向けに
+    # 運行実績が空なら初回アクセス時に合成データを自動投入する(冪等・キャッシュ済み接続のため1回のみ)。
+    if conn.execute("SELECT COUNT(*) AS n FROM trips").fetchone()["n"] == 0:
+        frames = synth_generate.generate_trips(start_date=date(2025, 1, 1))
+        synth_load.load(conn, frames)
     return conn
 
 
