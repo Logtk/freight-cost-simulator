@@ -186,7 +186,7 @@ def render(conn) -> None:
     st.subheader("見えないまま動くと、どこで空振りするか")
     mis = result.misdirected_courses.copy()
     if mis.empty:
-        st.success("この期間では、Lv1の判断でも誤った打ち手には至らなかった。")
+        st.success("この期間では、①(売上と輸送費だけ見える)の判断でも誤った打ち手には至らなかった。")
     else:
         mis["course_name"] = mis["course_id"].map(name_map)
         st.warning(

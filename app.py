@@ -172,8 +172,15 @@ def render_calc_form(conn):
 
         st.divider()
         m1, m2, m3 = st.columns(3)
-        m1.metric("損益分岐運賃", f"¥{result.breakeven_rate_yen:,}")
-        m2.metric("適正原価(標準的運賃相当)", f"¥{result.appropriate_cost_yen:,}")
+        m1.metric(
+            "損益分岐運賃", f"¥{result.breakeven_rate_yen:,}",
+            help="これを下回ると、走るだけで赤字になる金額です(燃料費・高速代のみで計算)。",
+        )
+        m2.metric(
+            "適正原価(標準的運賃相当)", f"¥{result.appropriate_cost_yen:,}",
+            help="人件費・車両償却まで含めた、長期的に持続可能な金額の目安です"
+            "(国交省「標準的運賃」の考え方に基づく試算)。",
+        )
         m3.metric(
             "現在の運賃" if cost_input.mode == ce.MODE_PAYMENT else "現在の請求額",
             f"¥{cost_input.current_rate_yen:,}",
@@ -208,13 +215,15 @@ def render_history(conn):
     n_critical = sum(1 for r in rows if r["alert_level"] == "CRITICAL")
     n_warning = sum(1 for r in rows if r["alert_level"] == "WARNING")
     if n_critical:
-        st.error(f"🔴 CRITICAL(適正原価を大きく下回る)が {n_critical} 件あります。")
+        st.error(f"🔴 適正原価を大きく下回る計算が {n_critical} 件あります。")
     if n_warning:
-        st.warning(f"🟡 WARNING(適正原価をわずかに下回る)が {n_warning} 件あります。")
+        st.warning(f"🟡 適正原価をわずかに下回る計算が {n_warning} 件あります。")
 
     df = pd.DataFrame([dict(r) for r in rows])
     df["mode"] = df["mode"].map(ce.MODE_LABELS)
-    df["alert_level"] = df["alert_level"].map({"OK": "🟢 OK", "WARNING": "🟡 WARNING", "CRITICAL": "🔴 CRITICAL"})
+    df["alert_level"] = df["alert_level"].map(
+        {"OK": "🟢 適正", "WARNING": "🟡 やや不足", "CRITICAL": "🔴 大幅に不足"}
+    )
     df = df.rename(columns={
         "calc_id": "ID", "created_at": "日時", "course_name": "コース", "vehicle_code": "車種",
         "mode": "モード", "distance_km": "距離(km)", "binding_hours": "拘束時間(h)",
